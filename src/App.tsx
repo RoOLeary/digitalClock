@@ -4,7 +4,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import './App.css'
 
-type Status = 'BUSY' | 'PAUSED' | 'READY';
+type Status = 'BUSY' | 'STANDBY' | 'READY';
 
 interface StatusProps {
 	status: Status;
@@ -300,8 +300,8 @@ const MainTime: React.FC<MainTimeProps> = (props) => {
 
 const StatusDescription: React.FC<StatusProps> = ({ status }) => {
 	const descriptions: Record<Status, string> = {
-		'BUSY': 'DANGER! DEV AT WORK. PLEASE DO NOT DISTURB!',
-		'PAUSED': 'CAUTION: APPROACH WITH CARE AND/OR BEER',
+		'BUSY': 'DANGER! DEV AT WORK. DO NOT DISTURB!',
+		'STANDBY': 'CAUTION: APPROACH WITH CARE (OR BEER)',
 		'READY': 'YOU HAVE TEMPORARY CLEARANCE TO ENGAGE VERBALLY.'
 	};
 
@@ -319,8 +319,8 @@ export default function App() {
 	const handleStatusChange = (newStatus: Status) => {
 		setStatus(newStatus);
 		document.documentElement.style.setProperty('--bg', 
-			newStatus === 'BUSY' ? '#FC5130' : 
-			newStatus === 'PAUSED' ? '#FFB800' : 
+			newStatus === 'BUSY' ? '#8B0000' : 
+			newStatus === 'STANDBY' ? '#FFB800' : 
 			'#00C853'
 		);
 	};
@@ -342,10 +342,10 @@ export default function App() {
 					BUSY
 				</button>
 				<button 
-					className={`statusButton ${status === 'PAUSED' ? 'active' : ''}`}
-					onClick={() => handleStatusChange('PAUSED')}
+					className={`statusButton ${status === 'STANDBY' ? 'active' : ''}`}
+					onClick={() => handleStatusChange('STANDBY')}
 				>
-					PAUSE
+					STAND BY
 				</button>
 				<button 
 					className={`statusButton ${status === 'READY' ? 'active' : ''}`}
