@@ -1,5 +1,5 @@
 :root {
-  --bg: #F00000;
+  --bg: #FC5130;
   --grad: #FFFAFF;
 }
 
@@ -11,6 +11,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.5s ease;
 }
 
 body,
@@ -23,10 +24,55 @@ html {
 
 .App {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
+  gap: 2rem;
+}
+
+.statusControls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  justify-content: space-between;
+  width: 100%; 
+}
+
+.statusButton {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--grad);
+  background: transparent;
+  color: var(--grad);
+  font-family: monospace;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;; 
+}
+
+.statusButton:hover {
+  background: var(--grad);
+  color: var(--bg);
+}
+
+.statusButton.active {
+  background: var(--grad);
+  color: var(--bg);
+}
+
+.statusContainer {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px; /* 5 * 16px (pixelSize) */
+}
+
+.statusText {
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.3));
+  transform: scale(1.25); /* Scale up to match clock size */
 }
 
 .container {

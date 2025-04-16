@@ -4,6 +4,12 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import './App.css'
 
+type Status = 'BUSY' | 'PAUSED' | 'READY';
+
+interface StatusProps {
+	status: Status;
+}
+
 interface DividerProps {
 	scope: React.RefObject<HTMLDivElement | null>;
 }
@@ -18,6 +24,154 @@ interface MainTimeProps {
 }
 
 const style = window.getComputedStyle(document.body);
+
+const StatusText: React.FC<StatusProps> = ({ status }) => {
+	const pixelSize = 16;
+	const letterSpacing = 4;
+	
+	// Pixel font data for each letter
+	const pixelFont: Record<string, number[][]> = {
+		'B': [
+			[1,1,1,1,0],
+			[1,0,0,0,1],
+			[1,1,1,1,0],
+			[1,0,0,0,1],
+			[1,1,1,1,0]
+		],
+		'U': [
+			[1,0,0,0,1],
+			[1,0,0,0,1],
+			[1,0,0,0,1],
+			[1,0,0,0,1],
+			[1,1,1,1,1]
+		],
+		'S': [
+			[0,1,1,1,1],
+			[1,0,0,0,0],
+			[0,1,1,1,0],
+			[0,0,0,0,1],
+			[1,1,1,1,0]
+		],
+		'Y': [
+			[1,0,0,0,1],
+			[0,1,0,1,0],
+			[0,0,1,0,0],
+			[0,0,1,0,0],
+			[0,0,1,0,0]
+		],
+		'P': [
+			[1,1,1,1,0],
+			[1,0,0,0,1],
+			[1,1,1,1,0],
+			[1,0,0,0,0],
+			[1,0,0,0,0]
+		],
+		'A': [
+			[0,1,1,1,0],
+			[1,0,0,0,1],
+			[1,1,1,1,1],
+			[1,0,0,0,1],
+			[1,0,0,0,1]
+		],
+		'E': [
+			[1,1,1,1,1],
+			[1,0,0,0,0],
+			[1,1,1,1,0],
+			[1,0,0,0,0],
+			[1,1,1,1,1]
+		],
+		'D': [
+			[1,1,1,1,0],
+			[1,0,0,0,1],
+			[1,0,0,0,1],
+			[1,0,0,0,1],
+			[1,1,1,1,0]
+		],
+		'R': [
+			[1,1,1,1,0],
+			[1,0,0,0,1],
+			[1,1,1,1,0],
+			[1,0,1,0,0],
+			[1,0,0,1,1]
+		],
+		' ': [
+			[0,0,0,0,0],
+			[0,0,0,0,0],
+			[0,0,0,0,0],
+			[0,0,0,0,0],
+			[0,0,0,0,0]
+		],
+		'O': [
+			[0,1,1,1,0],
+			[1,0,0,0,1],
+			[1,0,0,0,1],
+			[1,0,0,0,1],
+			[0,1,1,1,0]
+		],
+		'F': [
+			[1,1,1,1,1],
+			[1,0,0,0,0],
+			[1,1,1,1,0],
+			[1,0,0,0,0],
+			[1,0,0,0,0]
+		],
+		'I': [
+			[1,1,1,1,1],
+			[0,0,1,0,0],
+			[0,0,1,0,0],
+			[0,0,1,0,0],
+			[1,1,1,1,1]
+		],
+		'N': [
+			[1,0,0,0,1],
+			[1,1,0,0,1],
+			[1,0,1,0,1],
+			[1,0,0,1,1],
+			[1,0,0,0,1]
+		],
+		'T': [
+			[1,1,1,1,1],
+			[0,0,1,0,0],
+			[0,0,1,0,0],
+			[0,0,1,0,0],
+			[0,0,1,0,0]
+		]
+	};
+
+	const renderLetter = (letter: string, xOffset: number) => {
+		const pixels = pixelFont[letter] || pixelFont[' '];
+		return pixels.map((row, y) => 
+			row.map((pixel, x) => 
+				pixel === 1 ? (
+					<rect
+						key={`${x}-${y}`}
+						x={xOffset + (x * pixelSize)}
+						y={y * pixelSize}
+						width={pixelSize}
+						height={pixelSize}
+						fill={style.getPropertyValue('--grad')}
+					/>
+				) : null
+			)
+		);
+	};
+
+	const letters = status.split('');
+	const totalWidth = letters.length * (5 * pixelSize + letterSpacing);
+	
+	return (
+		<svg 
+			className="statusText" 
+			width={totalWidth} 
+			height={5 * pixelSize}
+			viewBox={`0 0 ${totalWidth} ${5 * pixelSize}`}
+		>
+			{letters.map((letter, index) => 
+				renderLetter(letter, index * (5 * pixelSize + letterSpacing))
+			)}
+		</svg>
+	);
+};
 
 const Divider: React.FC<DividerProps> = (props) => {
 	const colon = useRef<SVGPathElement>(null);
@@ -146,9 +300,42 @@ const MainTime: React.FC<MainTimeProps> = (props) => {
 
 export default function App() {
 	const container = useRef<HTMLDivElement>(null);
+	const [status, setStatus] = useState<Status>('BUSY');
+
+	const handleStatusChange = (newStatus: Status) => {
+		setStatus(newStatus);
+		document.documentElement.style.setProperty('--bg', 
+			newStatus === 'BUSY' ? '#FC5130' : 
+			newStatus === 'PAUSED' ? '#FFB800' : 
+			'#00C853'
+		);
+	};
 
 	return (
 		<div className="App">
+			<div className="statusControls">
+				<button 
+					className={`statusButton ${status === 'BUSY' ? 'active' : ''}`}
+					onClick={() => handleStatusChange('BUSY')}
+				>
+					BUSY
+				</button>
+				<button 
+					className={`statusButton ${status === 'PAUSED' ? 'active' : ''}`}
+					onClick={() => handleStatusChange('PAUSED')}
+				>
+					PAUSED
+				</button>
+				<button 
+					className={`statusButton ${status === 'READY' ? 'active' : ''}`}
+					onClick={() => handleStatusChange('READY')}
+				>
+					READY
+				</button>
+			</div>
+			<div className="statusContainer">
+				<StatusText status={status} />
+			</div>
 			<div className="container" ref={container}>
 				<MainTime scope={container} />
 			</div>
