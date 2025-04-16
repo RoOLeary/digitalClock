@@ -298,6 +298,20 @@ const MainTime: React.FC<MainTimeProps> = (props) => {
 	return <>{list}</>;
 }
 
+const StatusDescription: React.FC<StatusProps> = ({ status }) => {
+	const descriptions: Record<Status, string> = {
+		'BUSY': 'DANGER! DEV AT WORK. PLEASE DO NOT DISTURB!',
+		'PAUSED': 'CAUTION: APPROACH WITH CARE AND/OR BEER',
+		'READY': 'YOU HAVE TEMPORARY CLEARANCE TO ENGAGE VERBALLY.'
+	};
+
+	return (
+		<div className="statusDescription">
+			{descriptions[status]}
+		</div>
+	);
+};
+
 export default function App() {
 	const container = useRef<HTMLDivElement>(null);
 	const [status, setStatus] = useState<Status>('BUSY');
@@ -313,6 +327,13 @@ export default function App() {
 
 	return (
 		<div className="App">
+			<div className="statusContainer">
+				<StatusText status={status} />
+				<StatusDescription status={status} />
+			</div>
+			<div className="container" ref={container}>
+				<MainTime scope={container} />
+			</div>
 			<div className="statusControls">
 				<button 
 					className={`statusButton ${status === 'BUSY' ? 'active' : ''}`}
@@ -324,7 +345,7 @@ export default function App() {
 					className={`statusButton ${status === 'PAUSED' ? 'active' : ''}`}
 					onClick={() => handleStatusChange('PAUSED')}
 				>
-					PAUSED
+					PAUSE
 				</button>
 				<button 
 					className={`statusButton ${status === 'READY' ? 'active' : ''}`}
@@ -332,12 +353,6 @@ export default function App() {
 				>
 					READY
 				</button>
-			</div>
-			<div className="statusContainer">
-				<StatusText status={status} />
-			</div>
-			<div className="container" ref={container}>
-				<MainTime scope={container} />
 			</div>
 		</div>
 	);
